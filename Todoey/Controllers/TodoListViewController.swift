@@ -7,13 +7,16 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController {
 
     var itemArray = [Item]()
     
-    let dataFilePath = FileManager.default.urls(for: FileManager.SearchPathDirectory.documentDirectory, in: FileManager.SearchPathDomainMask.userDomainMask).first?.appendingPathComponent("Items.plist")
+  
     //let defaults = UserDefaults.standard
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,9 +85,11 @@ class TodoListViewController: UITableViewController {
             // What will happen once the user clicks the add Item button on out UIAlert.
             
             
-            let newItem = Item()
-            newItem.title = textField.text!
             
+            let newItem = Item(context: self.context)
+            
+            newItem.title = textField.text!
+            newItem.done = false
             self.itemArray.append(newItem)
         
             
@@ -105,12 +110,11 @@ class TodoListViewController: UITableViewController {
     //MARK - Save Data function
     
     func saveItems() {
-        let encoder = PropertyListEncoder()
+       
         do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
+           try context.save()
         } catch {
-            print("Error encoding data: \(error)")
+            print("Error savind data \(error)")
         }
         tableView.reloadData()
     }
@@ -118,16 +122,15 @@ class TodoListViewController: UITableViewController {
     //MARK - Retrive Data function
     
     func loadItems() {
-        if let data = try? Data(contentsOf: dataFilePath!) {
-            let decoder = PropertyListDecoder()
-            
-            do {
-            itemArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                print("Error decoding data \(error)")
-            }
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        do {
+        itemArray = try context.fetch(request)
+        } catch {
+            print("Error feaching data \(error)")
         }
-        }
+    
+    }
 
     
 }
