@@ -107,7 +107,7 @@ class TodoListViewController: UITableViewController {
         
     }
     
-    //MARK - Save Data function
+    //MARK: - Save Data function
     
     func saveItems() {
        
@@ -131,7 +131,30 @@ class TodoListViewController: UITableViewController {
         }
     
     }
-
+   
     
 }
-
+//MARK: - Search Bar methods (extention)
+extension TodoListViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        request.predicate = predicate
+        
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        request.sortDescriptors = [sortDescriptor]
+        
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("Error feaching data \(error)")
+        }
+        
+        tableView.reloadData()
+        
+       
+    }
+    
+}
