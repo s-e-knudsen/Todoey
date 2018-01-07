@@ -121,15 +121,16 @@ class TodoListViewController: UITableViewController {
     
     //MARK - Retrive Data function
     
-    func loadItems() {
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {  // the with: is the external param and the request is the internal. The after = is the default is not a param i given to the finc.
+        
+        //let request : NSFetchRequest<Item> = Item.fetchRequest()
         
         do {
         itemArray = try context.fetch(request)
         } catch {
             print("Error feaching data \(error)")
         }
-    
+       tableView.reloadData()
     }
    
     
@@ -139,21 +140,20 @@ extension TodoListViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let request : NSFetchRequest<Item> = Item.fetchRequest()
-        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         
-        request.predicate = predicate
         
-        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
-        request.sortDescriptors = [sortDescriptor]
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        //request.sortDescriptors = [sortDescriptor]
         
-        do {
-            itemArray = try context.fetch(request)
-        } catch {
-            print("Error feaching data \(error)")
-        }
-        
-        tableView.reloadData()
-        
+//        do {
+//            itemArray = try context.fetch(request)
+//        } catch {
+//            print("Error feaching data \(error)")
+//        }
+//
+//        tableView.reloadData()
+        loadItems(with: request)
        
     }
     
