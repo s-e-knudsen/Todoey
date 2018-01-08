@@ -157,4 +157,15 @@ extension TodoListViewController: UISearchBarDelegate {
        
     }
     
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            
+            DispatchQueue.main.async {   //makes the code run in the main Q not background
+                searchBar.resignFirstResponder()
+            }
+        }
+        
+    }
+    
 }
