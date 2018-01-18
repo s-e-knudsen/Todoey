@@ -9,7 +9,8 @@
 import UIKit
 import RealmSwift
 
-class CategoryViewController: UITableViewController {
+
+class CategoryViewController: SwipeTableViewController {
     //MARK: - Variables global
     let realm = try! Realm()
     
@@ -21,15 +22,19 @@ class CategoryViewController: UITableViewController {
         super.viewDidLoad()
 
         loadCategories()
+        tableView.rowHeight = 80
     }
 
     //MARK: - Tableview Datasource Metods
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+     
+        let cell = super.tableView(tableView, cellForRowAt: indexPath) //this takes the cell and row from the superclass swipetable...
         
         
         cell.textLabel?.text = catArray?[indexPath.row].name ?? "No category added yet"
+        
+     
         
         return cell
         
@@ -39,6 +44,15 @@ class CategoryViewController: UITableViewController {
         return catArray?.count ?? 1
         
     }
+    
+//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! SwipeTableViewCell
+//        cell.delegate = self
+//        return cell
+//    }
+    
+    
+    
     
     //MARK: - TableView Deligate Methods
     
@@ -86,6 +100,28 @@ class CategoryViewController: UITableViewController {
     }
     
  
+    
+    //MARK - Delete data
+    
+    override func updateModel(at indexPath: IndexPath) {
+        
+    
+        if let categoryItem = catArray?[indexPath.row] {
+            do {
+                try realm.write {
+                    realm.delete(categoryItem)  //deletes the item.
+                    
+                }
+            } catch {
+                print("Error updating status, \(error)")
+            }
+        }
+
+        
+        
+    }
+    
+    
     //MARK: - Save Data function
     
     func save(category: Category) {
@@ -107,3 +143,4 @@ class CategoryViewController: UITableViewController {
     
     
 }
+

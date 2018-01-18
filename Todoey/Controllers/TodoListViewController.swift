@@ -9,19 +9,19 @@
 import UIKit
 import RealmSwift
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
 
     var todoItems : Results<Item>?
     let realm = try! Realm()
     var selectedCategory : Category? {
         didSet{
             loadItems()
+            tableView.rowHeight = 80
         }
     }
   
     //let defaults = UserDefaults.standard
-    
-   
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +35,9 @@ class TodoListViewController: UITableViewController {
    //MARK - Tableview Datasource Methods
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+       // let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         if let item = todoItems?[indexPath.row] {
             //Ternary operator ==>
@@ -129,6 +131,27 @@ class TodoListViewController: UITableViewController {
        tableView.reloadData()
     }
    
+    //MARK - Delete data
+    
+    override func updateModel(at indexPath: IndexPath) {
+        
+        
+        if let item = todoItems?[indexPath.row] {
+            do {
+                try realm.write {
+                    realm.delete(item)  //deletes the item.
+                    
+                }
+            } catch {
+                print("Error updating status, \(error)")
+            }
+        }
+        
+        
+        
+    }
+    
+    
     
 }
 //MARK: - Search Bar methods (extention)
